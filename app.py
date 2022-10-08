@@ -1,36 +1,23 @@
-from flask import Flask, request, render_template, send_from_directory
-# from functions import ...
+from flask import Flask, send_from_directory
 
-POST_PATH = "posts.json"
-UPLOAD_FOLDER = "uploads/images"
+from main.views_main import *
+from loader.views_loader import *
+
 
 app = Flask(__name__)
 
+""" Регистрируем блюпринт"""
 
-@app.route("/")
-def page_index():
-    pass
-
-
-@app.route("/list")
-def page_tag():
-    pass
+app.register_blueprint(main_blueprint)  # Главная страница
+app.register_blueprint(loader_blueprint) # ОБработка запроса по добавлению нового поста
 
 
-@app.route("/post", methods=["GET", "POST"])
-def page_post_form():
-    pass
-
-
-@app.route("/post", methods=["POST"])
-def page_post_upload():
-    pass
-
-
+""" Функция загрузки файолв на сервер в указанную директорию """
 @app.route("/uploads/<path:path>")
 def static_dir(path):
-    return send_from_directory("uploads", path)
+    return send_from_directory("uploads", path) # отправляет файл для загрузки
 
+    # path - путь к файлу относительно каталога uploads
 
 app.run()
 

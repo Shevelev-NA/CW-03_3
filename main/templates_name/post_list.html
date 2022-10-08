@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все посты найденные по запросу "Кот и Хлеб"</title>
+    <link rel="stylesheet" href="../../static/style.css">
+</head>
+<body>
+<main>
+
+    <a href="/" class="link">Назад</a>
+
+    <h1>Посты по запросу "Кот и Хлеб"</h1>
+
+    <!--Цикл для для обхода по всем постам -->
+    {% for post in posts %}
+        <div class="post">
+            <img src="{{ post.pic }}"
+                 width="100%" alt="">
+            <p>{{ post.content }}</p>
+            <!-- текст данного поста -->
+        </div>
+
+        <!-- Тег hr для разделения содержимого -->
+    {% endfor %}
+    <hr>
+    <!-- создание кнопки для добавления поста и передачи содержимого в другой файл -->
+    <a href="/post/" class="button">Добавить пост</a>
+
+
+
+</main>
+</body>
+</html>
