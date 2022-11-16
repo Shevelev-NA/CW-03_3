@@ -4,8 +4,7 @@ from json import JSONDecodeError
 from flask import render_template, request, Blueprint, redirect
 import logging
 
-
-from functions import *
+import functions
 
 # JSONDecodeError - дл обработки ошибок во внешнем файле данных
 # render_template - служит для работы с шаблонами html
@@ -28,7 +27,7 @@ main_blueprint = Blueprint('main_blueprint', __name__, template_folder='template
 @main_blueprint.route('/')
 def main_page():
     bookmarks_count =functions.bookmarks_count()
-    posts_data = functions.get_text_without_tags_string_crop(post_data()) # Перечень всех постов (короткое описание)
+    posts_data = functions.get_text_without_tags_string_crop(functions.post_data()) # Перечень всех постов (короткое описание)
     return render_template('./index.html', posts=posts_data, bookmarks_count=bookmarks_count)
 
 
@@ -36,7 +35,7 @@ def main_page():
 """ Создайте представление для одного поста  """
 @main_blueprint.route('/post/<int:postid>')
 def post_page(postid:int):
-    posts_data = post_data()
+    posts_data = functions.post_data()
     try:
         output_post = functions.get_post_by_pk(posts_data, postid) # получаем определенный пост по его индифекатору
     except ValueError:
@@ -45,7 +44,7 @@ def post_page(postid:int):
     output_comments = functions.get_comments_by_post_id(postid) #  поучаем комментарии определенного  поста через ID поста
     comment_quantity = functions.comments_count(postid) #подсчет кол-ва комментариев
 
-    content = get_text_without_tags(output_post)  # получаем значение content  без символа #
+    content = functions.get_text_without_tags(output_post)  # получаем значение content  без символа #
 
     return render_template("./post.html", post=output_post, comments=output_comments, quantity=comment_quantity, content=content)
 
@@ -53,7 +52,7 @@ def post_page(postid:int):
 """ Создайте представление для определенного пользователя  """
 @main_blueprint.route('/user-feed/<user_name>')
 def get_posts_by_user(user_name):
-    posts_data = functions.get_text_without_tags_string_crop(post_data()) # Перечень всех постов (короткое описание) без тегов
+    posts_data = functions.get_text_without_tags_string_crop(functions.post_data()) # Перечень всех постов (короткое описание) без тегов
     try:
         output_post = functions.get_posts_by_user(posts_data, user_name)  # получаем определенные посты по имени пльзователя
     except ValueError:
@@ -69,7 +68,7 @@ def search_page():
     """ВЫполняем проверку на ошибки"""
     try:
         """Возвращаем перечень постов которые содерждат слово поиска. Поиск идет по всем постам"""
-        posts_data_with_query = search_for_posts(post_data(), search_query)
+        posts_data_with_query = functions.search_for_posts(functions.post_data(), search_query)
     except FileNotFoundError:
         logging.error("Файл не найден")
         return "Файл не найден"
@@ -97,11 +96,11 @@ def get_posts_by_tag(tag_name):
     api_logger.info("Вывод результатов поиска по тегам в консоли")
 
     """ Получаю список всех постов и их тегов"""
-    posts_data_with_tag = get_text_without_tags_string_crop(post_data())
+    posts_data_with_tag = functions.get_text_without_tags_string_crop(functions.post_data())
 
     """ Возвращает перечень постов c коротким описанием по определенному тегу"""
     try:
-        output_post = search_for_posts_by_teg(posts_data_with_tag, tag_name)
+        output_post = functions.search_for_posts_by_teg(posts_data_with_tag, tag_name)
     except ValueError:
         return "Такой тег  не найден"
     return render_template("./tag.html", posts=output_post, s=tag_name)
@@ -116,11 +115,11 @@ def add_bookmark(postid):
         logging.error(f"Указан не верный ID")
         return redirect("/", code=302)
 
-    if write_json(postid) is True:
+    if functions.write_json(postid) is True:
         logging.info(f"Пост c ID №{postid} уже есть в закладках")
         return redirect("/", code=302)
     else:
-        write_json(postid)
+        functions.write_json(postid)
         logging.info(f"Пост c ID №{postid} добавлен в закладки")
         return redirect("/", code=302) # код перенаправления 302
 
@@ -133,7 +132,7 @@ def remove_bookmark(postid):
     except ValueError:
         logging.error(f"Указан не верный ID")
 
-    remove_json(postid)
+    functions.remove_json(postid)
     logging.info(f"Пост c ID №{postid} удалЁн из закладок")
 
     return redirect("/bookmarks/", code=302) # код перенаправления 302
@@ -142,6 +141,6 @@ def remove_bookmark(postid):
 """ Создаем представление закладок """
 @main_blueprint.route('/bookmarks/')
 def bookmarks_page():
-    posts_data = functions.get_text_without_tags_string_crop(bookmarks_data())  # Перечень всех постов (короткое описание)
+    posts_data = functions.get_text_without_tags_string_crop(functions.bookmarks_data())  # Перечень всех постов (короткое описание)
     return render_template("bookmarks.html", posts=posts_data)
 
