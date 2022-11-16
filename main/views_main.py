@@ -4,7 +4,7 @@ from json import JSONDecodeError
 from flask import render_template, request, Blueprint, redirect
 import logging
 
-import functions
+
 from functions import *
 
 # JSONDecodeError - дл обработки ошибок во внешнем файле данных
